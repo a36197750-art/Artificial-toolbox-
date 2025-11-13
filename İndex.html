@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Toolbox — Enes</title>
+  <style>
+    :root{
+      --bg: #071029;
+      --card-bg: rgba(255,255,255,0.03);
+      --muted: #98a0b3;
+      --accent: #38bdf8;
+      --accent2: #7c3aed;
+      --glass: rgba(255,255,255,0.04);
+      --text: #e6eef8;
+      --radius: 14px;
+      --max-width: 920px;
+    }
+    [data-theme="light"]{
+      --bg:#f6fbff;
+      --card-bg: rgba(8,13,20,0.06);
+      --muted:#475569;
+      --accent:#0369a1;
+      --accent2:#7c3aed;
+      --glass: rgba(8,13,20,0.04);
+      --text:#071029;
+    }
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+body{
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(88,28,135,0.18), transparent 12%),
+    radial-gradient(900px 450px at 95% 80%, rgba(3,105,161,0.12), transparent 12%),
+    linear-gradient(180deg, var(--bg), rgba(0,0,0,0.02));
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px;
+  transition:background .6s, color .4s;
+  overflow:hidden;
+}
+
+.bg-blobs{position:fixed; inset:0; z-index:0; pointer-events:none; mix-blend-mode:screen; opacity:.9;}
+.blob{position:absolute; border-radius:50%; filter: blur(70px); transform: translate3d(0,0,0); animation: float 12s ease-in-out infinite; opacity:0.9;}
+.b1{width:520px;height:520px;left:-10%;top:5%; background:linear-gradient(90deg,#a855f7,#38bdf8);}
+.b2{width:360px;height:360px;right:-5%;bottom:-5%; background:linear-gradient(90deg,#f97316,#f43f5e); animation-duration:16s;}
+@keyframes float{0%{transform:translateY(0) scale(1);}50%{transform:translateY(-40px) scale(1.06);}100%{transform:translateY(0) scale(1);}}
+
+.wrap{position:relative; z-index:2; width:100%; max-width:var(--max-width); margin:0 auto;}
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.45);
+  backdrop-filter: blur(6px) saturate(120%);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.title{display:flex;gap:12px;align-items:center;}
+.logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white; font-size:18px;box-shadow:0 6px 18px rgba(124,58,237,0.18);}
+h1{font-size:1.25rem;margin:0;letter-spacing:0.2px;}
+p.lead{margin:0;color:var(--muted);font-size:.92rem}
+
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 10px 0;}
+.tool-btn{padding:9px 12px;border-radius:10px;border:none;background:var(--card-bg);color:var(--text);cursor:pointer;font-weight:600;transition:transform .18s, background .18s;}
+.tool-btn:active{transform:scale(.98)}
+.tool-btn:hover{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03))}
+
+textarea#inputText{width:100%; min-height:150px; resize:vertical; padding:12px;border-radius:10px;border:none;background:rgba(0,0,0,0.12); color:var(--text); font-size:0.95rem; outline:none; box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);}
+[data-theme="light"] textarea#inputText{background:rgba(0,0,0,0.03);}
+
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:10px;}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.action-btn{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent2));color:white;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(3,105,161,0.12);transition:transform .14s, opacity .14s;}
+.action-btn.secondary{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.04);box-shadow:none}
+.action-btn:active{transform:scale(.99)}
+
+.result{margin-top:12px;padding:12px;border-radius:10px;background:var(--card-bg);min-height:70px;color:var(--accent);white-space:pre-wrap;word-break:break-word;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;}
+.small{font-size:.82rem;color:var(--muted)}
+
+.history{margin-top:12px;background:transparent;padding:8px;border-radius:10px;color:var(--muted);font-size:.9rem}
+.history-item{padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.03)}
+
+.ad-bar{margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ad-left{display:flex;align-items:center;gap:10px}
+.ad-badge{font-weight:700;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);color:var(--accent)}
+.ad-text{color:var(--text); font-weight:600}
+.ad-controls{display:flex;gap:8px}
+.link{color:inherit;text-decoration:none}
+
+.bottom-note{margin-top:12px;color:var(--muted);font-size:.85rem;text-align:center}
+
+/* mobile-fit class (shrink for mobile) */
+.mobile-fit textarea#inputText{min-height:100px;padding:8px;font-size:0.86rem;}
+.mobile-fit .card{padding:12px;border-radius:10px;}
+.mobile-fit .logo{width:44px;height:44px}
+.mobile-fit h1{font-size:1.05rem}
+.mobile-fit nav{gap:6px}
+.mobile-fit .result{min-height:56px;font-size:0.92rem;padding:10px}
+.mobile-fit .action-btn{padding:8px 10px;font-size:0.92rem}
+
+@media (max-width:640px){
+  .row{flex-direction:column}
+  header{flex-direction:column;align-items:flex-start;gap:8px}
+  .logo{width:46px;height:46px}
+  body{padding:16px}
+  .wrap{max-width:640px}
+}
+
+  </style>
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+  </div>
+  <div class="wrap">
+    <div class="card" id="mainCard">
+      <header>
+        <div class="title">
+          <div class="logo">AI</div>
+          <div>
+            <h1>AI Toolbox</h1>
+            <p class="lead">Works on mobile, fast & practical tools — all in one place</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="tool-btn" id="mobileFitBtn" title="Fit to screen (mobile)">📲</button>
+          <button class="tool-btn" id="themeBtn" title="Switch theme">🌙</button>
+          <button class="tool-btn" id="editAdBtn" title="Edit ad/announcement">✏️ Edit Ad</button>
+        </div>
+      </header>
+
+      <nav id="nav">
+        <button class="tool-btn" onclick="setTool('uppercase')">UPPERCASE</button>
+        <button class="tool-btn" onclick="setTool('lowercase')">lowercase</button>
+        <button class="tool-btn" onclick="setTool('reverse')">Reverse</button>
+        <button class="tool-btn" onclick="setTool('trim')">Trim Spaces</button>
+        <button class="tool-btn" onclick="setTool('base64encode')">Base64 Encode</button>
+        <button class="tool-btn" onclick="setTool('base64decode')">Base64 Decode</button>
+        <button class="tool-btn" onclick="setTool('wordcount')">Word/Char Count</button>
+        <button class="tool-btn" onclick="setTool('json')">JSON Formatter</button>
+        <button class="tool-btn" onclick="setTool('removeLine')">Remove Line Breaks</button>
+        <button class="tool-btn" onclick="setTool('capitalize')">Capitalize Words</button>
+        <button class="tool-btn" onclick="setTool('urlencode')">URL Encode</button>
+        <button class="tool-btn" onclick="setTool('urldecode')">URL Decode</button>
+        <button class="tool-btn" onclick="setTool('findword')">Find Word</button>
+      </nav>
+
+      <main>
+        <textarea id="inputText" placeholder="Paste or type text here..."></textarea>
+
+        <div class="row">
+          <div class="tools">
+            <button class="action-btn" onclick="copyResult()">📋 Copy</button>
+            <button class="action-btn" onclick="downloadResult()">💾 Download</button>
+            <button class="action-btn secondary" onclick="clearAll()">🗑️ Clear</button>
+            <button class="action-btn secondary" onclick="pasteFromClipboard()">📥 Paste</button>
+          </div>
+          <div style="margin-left:auto" class="small">Tool: <b id="currentToolLabel">—</b></div>
+        </div>
+
+        <div class="result" id="outputArea">Result appears here...</div>
+
+        <div class="history" id="historyArea"><b>Recent Actions</b></div>
+      </main>
+
+      <div class="ad-bar" id="adBar">
+        <div class="ad-left">
+          <div class="ad-badge">Announcement</div>
+          <div>
+            <div class="ad-text" id="adText">You can add an ad, announcement, or link here.</div>
+            <div class="small">Clicking it will open the set link.</div>
+          </div>
+        </div>
+        <div class="ad-controls">
+          <a href="#" target="_blank" id="adLink" class="action-btn secondary link">Visit</a>
+        </div>
+      </div>
+
+      <div class="bottom-note">
+        <div>Made by Enes • Local & National • Made in Turkey</div>
+      </div>
+    </div>
+  </div>
+  <script>
+  /* ===== Variables & LocalStorage keys ===== */
+  const input = document.getElementById('inputText');
+  const output = document.getElementById('outputArea');
+  const historyArea = document.getElementById('historyArea');
+  const currentLabel = document.getElementById('currentToolLabel');
+  const themeBtn = document.getElementById('themeBtn');
+  const mobileFitBtn = document.getElementById('mobileFitBtn');
+  const editAdBtn = document.getElementById('editAdBtn');
+  const adTextEl = document.getElementById('adText');
+  const adLinkEl = document.getElementById('adLink');
+
+  const HISTORY_KEY = 'ya_history_v1';
+  const THEME_KEY = 'ya_theme_v1';
+  const AD_KEY = 'ya_ad_v1';
+  const MOBILE_FIT_KEY = 'ya_mobilefit_v1';
+
+  let currentTool = '';
+
+  /* ===== Load / persist theme ===== */
+  function loadTheme(){
+    const t = localStorage.getItem(THEME_KEY) || 'dark';
+    if(t === 'light'){ 
+      document.body.setAttribute('data-theme','light'); 
+      themeBtn.textContent='☀️'; 
+    } else { 
+      document.body.removeAttribute('data-theme'); 
+      themeBtn.textContent='🌙'; 
+    }
+  }
+  themeBtn.addEventListener('click', ()=>{
+    const current = document.body.getAttribute('data-theme');
+    if(current === 'light'){
+      document.body.removeAttribute('data-theme');
+      localStorage.setItem(THEME_KEY,'dark');
+      themeBtn.textContent='🌙';
+    } else {
+      document.body.setAttribute('data-theme','light');
+      localStorage.setItem(THEME_KEY,'light');
+      themeBtn.textContent='☀️';
+    }
+  });
+
+  /* ===== Mobile fit load/persist ===== */
+  function loadMobileFit(){
+    const v = localStorage.getItem(MOBILE_FIT_KEY) || 'off';
+    if(v === 'on'){ 
+      document.documentElement.classList.add('mobile-fit'); 
+      mobileFitBtn.textContent='📱'; 
+    } else { 
+      document.documentElement.classList.remove('mobile-fit'); 
+      mobileFitBtn.textContent='📲'; 
+    }
+  }
+  mobileFitBtn.addEventListener('click', ()=>{
+    const curr = localStorage.getItem(MOBILE_FIT_KEY) || 'off';
+    if(curr === 'on'){
+      localStorage.setItem(MOBILE_FIT_KEY,'off');
+      document.documentElement.classList.remove('mobile-fit');
+      mobileFitBtn.textContent='📲';
+      toast('Mobile fit disabled');
+    } else {
+      localStorage.setItem(MOBILE_FIT_KEY,'on');
+      document.documentElement.classList.add('mobile-fit');
+      mobileFitBtn.textContent='📱';
+      toast('Mobile fit enabled');
+    }
+  });
+
+  /* ===== Ad / announcement management ===== */
+  function loadAd(){
+    const ad = JSON.parse(localStorage.getItem(AD_KEY) || '{}');
+    adTextEl.textContent = ad.text || 'You can add an ad, announcement, or link here.';
+    adLinkEl.href = ad.href || '#';
+    adLinkEl.textContent = ad.linkLabel || 'Visit';
+  }
+  editAdBtn.addEventListener('click', ()=>{
+    const old = JSON.parse(localStorage.getItem(AD_KEY) || '{}');
+    const text = prompt('Announcement text (short):', old.text || 'New announcement or ad');
+    if(text === null) return;
+    const href = prompt('Target link (full URL or #):', old.href || '#');
+    if(href === null) return;
+    const label = prompt('Button text:', old.linkLabel || 'Visit');
+    if(label === null) return;
+    const ad = { text, href, linkLabel: label };
+    localStorage.setItem(AD_KEY, JSON.stringify(ad));
+    loadAd();
+    toast('Announcement saved ✔');
+  });
+
+  /* ===== Tool set & main function ===== */
+  function setTool(tool){
+    currentTool = tool;
+    currentLabel.textContent = tool;
+    processText();
+    try{ navigator.vibrate?.(20); }catch(e){}
+  }
+
+  function processText(){
+    const t = input.value || '';
+    let res = '';
+    try{
+      switch(currentTool){
+        case 'uppercase': res = t.toUpperCase(); break;
+        case 'lowercase': res = t.toLowerCase(); break;
+        case 'reverse': res = t.split('').reverse().join(''); break;
+        case 'trim': res = t.replace(/\s+/g,' ').trim(); break;
+        case 'base64encode': res = btoa(unescape(encodeURIComponent(t))); break;
+        case 'base64decode': res = decodeURIComponent(escape(atob(t))); break;
+        case 'wordcount': res = wordCount(t); break;
+        case 'json': res = formatJson(t); break;
+        case 'removeLine': res = t.replace(/(\r\n|\n|\r)/gm,' '); break;
+        case 'capitalize': res = capitalizeWords(t); break;
+        case 'urlencode': res = encodeURIComponent(t); break;
+        case 'urldecode': res = decodeURIComponent(t); break;
+        case 'findword': res = findWordDialog(t); break;
+        default: res = 'Select a tool and enter some text.';
+      }
+    }catch(err){
+      res = '⚠️ Error: Invalid input or operation failed.';
+    }
+    output.textContent = res;
+    if(t.trim() !== '') saveHistory(currentTool, t, res);
+  }
+
+  /* ===== Helper functions ===== */
+  function wordCount(text){
+    const chars = text.length;
+    const words = (text.trim().match(/\S+/g) || []).length;
+    const sentences = (text.match(/[.!?]+/g) || []).length;
+    return `Characters: ${chars}\nWords: ${words}\nSentences: ${sentences}`;
+  }
+
+  function formatJson(text){
+    try{
+      const obj = JSON.parse(text);
+      return JSON.stringify(obj, null, 2);
+    }catch(e){
+      throw new Error('Invalid JSON. Use correct JSON with double quotes.');
+    }
+  }
+
+  function capitalizeWords(s){
+    return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function findWordDialog(t){
+    const word = prompt('Enter the word to search:');
+    if(word === null) return 'Search cancelled.';
+    const re = new RegExp(escapeRegExp(word), 'gi');
+    const matches = t.match(re) || [];
+    return `Searched: "${word}"\nOccurrences: ${matches.length}\n\nSample matches:\n` + (matches.slice(0,10).map((m,i)=>`${i+1}. ${m}`).join('\n') || 'Not found');
+  }
+
+  function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  /* ===== History ===== */
+  function saveHistory(tool, inputText, result){
+    const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    h.unshift({
+      tool, input: inputText.slice(0,200), output: result.slice(0,200), date: new Date().toLocaleString()
+    });
+    if(h.length>12) h.splice(12);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+    renderHistory();
+  }
+  function renderHistory(){
+    const h = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    if(!h.length){ historyArea.innerHTML = '<b>Recent Actions</b><div class="small">No records yet.</div>'; return; }
+    let html = '<b>Recent Actions</b>';
+    h.forEach(item=>{
+      html += `<div class="history-item"><div class="small"><b>${escapeHtml(item.tool)}</b> • ${escapeHtml(item.date)}</div><div style="margin-top:6px;font-family:ui-monospace,monospace">${escapeHtml(item.input)} → ${escapeHtml(item.output)}</div></div>`;
+    });
+    html += '<div style="margin-top:8px"><button class="tool-btn" onclick="clearHistory()">Clear History</button></div>';
+    historyArea.innerHTML = html;
+  }
+  function clearHistory(){ 
+    if(confirm('Are you sure you want to clear history?')){
+      localStorage.removeItem(HISTORY_KEY);
+      renderHistory();
+      toast('History cleared');
+    }
+  }
+
+  /* ===== Copy / Download / Clear / Paste ===== */
+  async function copyResult(){
+    try{
+      await navigator.clipboard.writeText(output.textContent);
+      toast('Result copied ✔');
+    }catch(e){
+      alert('Copying is not supported or permission denied.');
+    }
+  }
+  function downloadResult(){
+    const blob = new Blob([output.textContent || ''], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'result.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('Download started');
+  }
+  function clearAll(){
+    if(!confirm('Do you want to clear all fields?')) return;
+    input.value=''; output.textContent='Result appears here...'; currentLabel.textContent='—'; toast('Cleared');
+  }
+  async function pasteFromClipboard(){
+    try{
+      const text = await navigator.clipboard.readText();
+      input.value += text;
+      processText();
+      toast('Pasted from clipboard');
+    }catch(e){
+      alert('No access to clipboard.');
+    }
+  }
+
+  /* ===== Helpers ===== */
+  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function toast(msg){
+    const el = document.createElement('div');
+    el.textContent = msg;
+    el.style.position='fixed'; el.style.bottom='24px'; el.style.left='50%'; el.style.transform='translateX(-50%)';
+    el.style.background='rgba(2,6,23,0.8)'; el.style.color='white'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.zIndex=9999;
+    document.body.appendChild(el);
+    setTimeout(()=> el.style.opacity='0',1600);
+    setTimeout(()=> el.remove(),2000);
+  }
+
+  /* ===== Init ===== */
+  input.addEventListener('input', () => { if(currentTool) processText(); });
+  window.addEventListener('load', ()=>{
+    loadTheme();
+    loadMobileFit();
+    renderHistory();
+    loadAd();
+  });
+
+  /* prevent default ad click if no link */
+  adLinkEl.addEventListener('click', (e)=>{
+    if(!adLinkEl.href || adLinkEl.href.endsWith('#')){ e.preventDefault(); alert('No link set yet. Use "Edit Ad" to add one.'); }
+  });
+
+  /* global error logging (optional) */
+  window.addEventListener('error', (e) => {
+    console.error('Error:', e.message);
+  });
+</script>
